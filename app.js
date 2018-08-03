@@ -23,7 +23,7 @@ var socketUsers = [];
 
 
 //listning the server
-server.listen(5000);
+server.listen(8080);
 
 // setting up session middleware
 app.use(session({secret: 'secretdata'}));
