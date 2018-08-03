@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "my first node application",
   "main": "app.js",
-  "scripts": {
+  "script": {
      "start": "node app.js"
   },
   
