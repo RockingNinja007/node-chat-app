@@ -1,0 +1,150 @@
+<% include ../res/header.ejs %>
+<% include ../res/navbar.ejs %>
+<div id="container" class="col-lg-12 col-md-12 col-sm-12 col-sx-12" style="padding: 65px 20vw">
+    
+    <div id="dashboardcontainer"  class="col-lg-6  col-md-6 col-sm-6 col-sx-6" style="float: left;">
+            <% if(uname){%> 
+                <p><b>Hello</b> <span id="servermsg" class="servermsg"><%= uname %></span> !!</p><br/>
+            <%}%>            
+            <input type="button" id="startCahtBtn" value="start chat" style="margin: 10vh;display: none;">
+            <div id="usersConnected" style=" text-align: left ;color: #000;font-weight: bold">
+                <!-- users connected to socket will be shown here -->               
+               
+            </div>
+    </div>    
+    
+    <div id="chatcontainer" style="display: block;float: right;"  class="col-lg-6  col-md-6 col-sm-6 col-sx-6">
+            <% include ./chatView.ejs %>
+    </div>
+
+</div>
+
+ 
+<% include ../res/footer.ejs %>
+
+<script>
+
+    $(document).ready(function() {
+    
+// ==================== variable declaration ========================
+
+        var chatStartBtn = $("#startCahtBtn");
+        var dashboardcontainer = $("#dashboardcontainer");
+        var chatcontainer = $("#chatcontainer");
+        var usersConnected = $("#usersConnected");
+        var sendmsgform = $("#sendmsgform");
+        var chatMsg = $("#msg");
+        var clientSocket;
+        var chatsection = $("#chatsection");
+        var servermsg = $("#servermsg");
+        var servermsg = $("#servermsg");
+
+ //==================== connecting to socket ==================================
+
+        clientSocket = io.connect();
+
+//======================= adding a user as soon as page loads =========================
+
+        clientSocket.emit("add user",{user : servermsg.html().toString()});
+        
+// ======================= not required really =======================
+
+        chatStartBtn.click((e)=>{
+            //e.preventDefault();
+            chatStartBtn.css("display","none");
+            chatcontainer.css("display","block");
+           
+        });
+
+//==================== event to handle if any user logges in or out from the socket ===============
+
+        clientSocket.on("user status changed",(data)=>{
+            usersConnected.html("");
+            data.forEach(element => {
+                usersConnected.append("<div class='user_element' style='width:fit-content'>"+
+                    "<div class='users_status' name='demo work'><span class='users_name'>"+element+"</span><span class='users_online_status'>(online)</span></div>"+
+                    "<div class='users_chat_box hide' style='margin-left:10px;position:fixed;'>"+
+                        "<div class='close_parent glyphicon glyphicon-remove' style='float:right'></div><br/>"+
+                        "<div id='"+element+"' class=' chat_section' style='margin-bottom:5px;padding: 10px;height:30vh;overflow: scroll;width: 100%; '>"+
+                        "</div>"+
+                        "<input style='width:200px;' class='users_p_chat_msg' type='text' size='6' autocomplete='off' placeholder='write ur msg here'>"+
+                        "<button class='users_p_chat_submit_btn' type='button'>"+
+                            "<span class='glyphicon glyphicon-send'></span>"+
+                        "</button>"+
+                    "</div><br/>"+
+                "</div>");
+            });
+
+            $(".close_parent").click(function(){
+                $(this).parent(".users_chat_box").toggleClass("show");
+            });
+            
+//===================== event to display chat box for personal chat ==========================
+            $(".users_status").click(function(){
+                //alert($(this).children('span').html());
+                //$(".users_chat_box")
+                var usertosend =$(this).children('span').html(); 
+                $(this).siblings('.users_chat_box').toggleClass("show");
+                var submit_button = $(this).siblings('.users_chat_box').children(".users_p_chat_submit_btn");
+                submit_button.click(function(e){
+                   // alert($(this).siblings(".users_p_chat_msg").val());
+                    var message = ''+$(this).siblings(".users_p_chat_msg").val().toString();
+                    if(message!=''){
+                        clientSocket.emit("private_message_sending",{to:usertosend,msg:message});
+                    }                 
+                    $(this).siblings(".chat_section").append("<div style='border-radius: 10px 0px 10px 10px;background-color: green;padding: 5px;color: azure;width: fit-content;float:right'> <div class='chat_elements'>"+$(this).siblings(".users_p_chat_msg").val()+"</div></div><br style='clear: right'/><br/>");                    
+                    $(this).siblings(".users_p_chat_msg").val("");
+                });
+            });
+        }); 
+
+// =========================== event to handle when user sends broadcast message =====================        
+        sendmsgform.submit((e)=>{
+            e.preventDefault();
+            //alert("something writen on the sheet is" + chatMsg.val());
+            if(chatMsg.val() != ''){
+                clientSocket.emit("sendingmsg",{user : servermsg.html(), msg: chatMsg.val()});                
+            }            
+            chatMsg.val("");
+        });               
+
+//======================= event to handle when personal chat is recieved from the server socket ============
+        clientSocket.on("private_msg_recieve", (data)=>{
+
+            $("#"+data.user).append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
+            $("#"+data.user).animate({scrollTop: $("#"+data.user)[0].scrollHeight},200);    
+            //$("#"+data.user).append("<div style='float:left;width: 0;height: 0;border-top: 6px solid transparent;border-bottom: 6px solid transparent;border-right:15px solid gray;'></div><div style='float:left;border-radius: 0px 10px 10px 10px;background-color: gray;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.user+"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div style='font-style: italic;'>"+data.msg+"</div></div><br style='clear:left'/><br>");
+        });
+
+//================= event to handle when broadcast chat is recieved from the server socket =================
+        clientSocket.on("servmsg",(data)=>{
+            if(data.user === servermsg.html()){
+                chatsection.append("<div style='border-radius: 10px 0px 10px 10px;background-color: green;padding: 5px;color: azure;width: fit-content;float:right'> <div class='chat_elements'>"+data.msg+"</div></div><br style='clear: right'/><br/>");    
+            }
+            else{
+                chatsection.append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.user+"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
+            }
+            //smooth scroling chatsection 
+            $("#chatsection").animate({scrollTop: $("#chatsection")[0].scrollHeight},200);
+        });
+
+//===================== prevent navbar links to refresh page on clicked =====================
+        //navbar styling 
+        $("#nav-link").click((e)=>{
+            e.preventDefault();
+        });
+
+//========================= evet to handle when user logges out ====================
+        $("#logout-button").click((e)=>{
+            e.preventDefault();
+            //clientSocket.emit("logout_user", servermsg.html());
+            $.post("/afterlogout",servermsg.html(),(status)=>{
+                if(status=="ok"){
+                    window.location.replace("../../");
+                }
+            });
+        });
+        
+
+    });
+</script>

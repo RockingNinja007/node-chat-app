@@ -1,0 +1,42 @@
+<% include res/header.ejs %>
+<div class="miancontainer" style="display: block;padding-top: 20vh;padding-left: 30vw">
+    <span class="conatiner">
+        <div id="def">
+            <p id="messageDisp">Please login to continue...</p>
+            <p style=" display: none"; >message from server <%= error %></p> 
+            <form id="demoform" action="views/login.ejs">
+                <input type="submit"/>
+            </form>
+            </div>
+            <div id="login" style="display:none;">
+                <% include views/login.ejs %>
+            </div>
+    </span>
+</div>
+
+
+<% include res/footer.ejs %>
+<!-- Scripts section for the page-->
+    
+<script>
+    $(document).ready(function() {  
+        
+        //console.log("demo working");
+        var msgdisp = $("#messageDisp");
+        var formsubmit = $("#demoform");
+        var clientSocket = io.connect();
+        var def= $("#def");
+        var login = $("#login");
+        
+        formsubmit.submit((e)=>{
+            e.preventDefault();
+            clientSocket.emit("emmiteddata","working fine");
+        });
+        
+        clientSocket.on("servresp",(msg)=>{
+            //msgdisp.html(msg);
+            def.hide();
+            login.css("display", "block");
+        });
+    });  
+</script>

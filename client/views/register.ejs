@@ -1,0 +1,182 @@
+<% include ../res/header.ejs %>
+
+<div class="col-lg-12 col-md-12 col-sm-12" >
+    <div class="regcontainer col-lg-12 col-md-12 col-sm-12" >
+        <div class="col-lg-3 col-md-3 col-sm-1 col-sx-12"></div>
+        <div class="col-lg-6 col-md-6 col-sm-10 col-sx-12" style="text-align: center;padding: 10px 10px;">
+            <div class="form_conatiner" >
+                <% if(error){%>
+                    <p class="servermsg" style="text-align: left"><%= error %></p>
+                <%}%>
+                <h2> Sign In</h2>
+
+
+                <form id="registerform">
+                    
+                    <label for="username">Username<span style="color:red;font-size: 18px;">*</span></label><br/>
+                    <div> 
+                        <div class="input_parent">
+                            <span class="glyphicon glyphicon-user"></span>
+                            <input class="may_have_error" type="email" data-error="Invalid email address" name="username" id="username" autocomplete="off" required>
+                        </div> <br/>                   
+                        <div class="input_error_message hide"></div>
+                    </div> <br/>                    
+                    
+                    <label for="userpass">Choose Password <span style="color:red;font-size: 18px;">*</span></label><br/>
+                    <div>
+                        <div class="input_parent">
+                            <span class="glyphicon glyphicon-lock"></span>
+                            <input class="may_have_error input_to_toggle" type="text" name="userpass" id="userpass" autocomplete="off" required>
+                            <span class="glyphicon glyphicon-eye-open toggletext"></span> 
+                        </div>  <br/>                      
+                        <div class="input_error_message hide"></div> 
+                    </div> 
+
+                    <label style="display:none" for="confpass">Confim Pasword <span style="color:red;font-size: 18px;">*</span></label><br/>
+                    <div style="display:none"> 
+                        <div class="input_parent">
+                            <span class="glyphicon glyphicon-lock"></span>
+                            <input class="may_have_error input_to_toggle" type="text" name="confpass" id="confpass" autocomplete="off" required>
+                            <span class="glyphicon glyphicon-eye-open toggletext"></span> 
+                        </div> <br/>
+                        <div class="input_error_message hide"></div>                         
+                    </div>
+                    
+                    <label for="addresss">Address<span style="color:red;font-size: 18px;">*</span></label><br/>
+                    <div> 
+                        <div class="input_parent">
+                            <span class="glyphicon glyphicon-user"></span>
+                            <input class="may_have_error" type="text" name="address" id="address" autocomplete="off" required>
+                        </div> <br/>                   
+                        <div class="input_error_message hide"></div>
+                    </div> <br/> 
+
+                    <label for="contact">Contact<span style="color:red;font-size: 18px;">*</span></label><br/>
+                    <div> 
+                        <div class="input_parent">
+                            <span class="glyphicon glyphicon-user"></span>
+                            <input class="may_have_error" type="text" name="contact" id="contact" autocomplete="off" required>
+                        </div> <br/>                   
+                        <div class="input_error_message hide"></div>
+                    </div> <br/> 
+                    <input class="submit_button" type="submit" value="register!">
+                </form>
+
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-1 col-sx-12"></div>
+    </div>
+</div>  
+
+
+<% include ../res/footer.ejs %>
+
+
+<script>
+
+    $(document).ready(function() {  
+        var registerform = $("#registerform");
+        var username = $("#username");
+        var Password = $("#userpass");
+        var confpass = $("#confpass");
+        var servermsg = $("#servermsg");
+        var contact = $("#contact");
+        var address = $("#address");
+        registerform.submit((e)=>{
+            e.preventDefault();
+            var data = {
+                username : username.val(), 
+                userpass:Password.val()
+            };
+
+            $.post("/afterRegstration", data, (status)=>{
+                //servermsg.html(status);
+                if(status === 'ok'){
+                    alert("User registered sucessfully");
+                    window.location.replace("../");
+                }
+                username.val("");
+                Password.val("");
+                //if()
+            });
+        });
+
+        $(".toggletext").click(function(){
+            var input_to_hide = $(this).siblings(".input_to_toggle");
+            //$(this).siblings(".input_to_toggle").att .attr('type', 'text');
+            if(input_to_hide.attr("type") == "text"){
+                input_to_hide.attr("type", "password");
+            }
+            else{
+                input_to_hide.attr("type","text");
+            }
+            
+            $(this).toggleClass("glyphicon-eye-close");                
+        });
+        
+        $(".may_have_error").focusout(function(){
+            var error_message_to = $(this).parent(".input_parent");
+            var message ="";
+            if($(this).val() == ""){
+                message = "field can't be left empty";
+            }
+            else if($(this).attr("id") == username.attr("id")){
+                message = validate_user_name();
+            }
+            else if($(this).attr("id") == Password.attr("id")){
+                message = validate_password();
+            }
+            else if($(this).attr("id") == confpass.attr("id")){
+                message = validate_conf_password();
+            }
+            else{
+                message = "";
+            }
+
+            if(message != ""){
+                error_message_to.siblings(".input_error_message").text(message)
+                error_message_to.siblings(".input_error_message").addClass("show");
+            }
+            else{
+                error_message_to.siblings(".input_error_message").removeClass("show");
+            }
+            
+        });
+        
+        function validate_user_name(){
+            var message="";
+            var email_format = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var result = email_format.test(username.val())
+            if(!result){
+                return "invalid email format";
+            }
+            else{
+                return "";
+            }
+        }
+        function validate_password(){
+            var check_format =/^(([a-zA-Z]{6,}))$/;
+            var result= check_format.test(Password.val());
+            if(!result){
+                return "enter a string of lenght 6";
+            }
+            else{
+                return "";
+            }
+        }
+        function validate_conf_password(){
+            //var check_format = password.val();
+            //var result= check_format.test(Password.val());
+            var a=confpass.val(); 
+            if(a != password.val()){
+                return "password dosen't match";
+            }
+            else{
+                return "";
+            }
+        }            
+     });
+
+</script>
+       
+          

@@ -1,0 +1,76 @@
+
+<% include ../res/header.ejs %>
+
+
+
+<div id="container">
+    <div class="maincontainer col-lg-12 col-md-12" >
+        <div class="imagecontainer col-lg-6 col-md-6 col-sm-12 col-sx-12" >
+           
+        </div>
+
+        <div id="logincontainer" class="centered loginform col-lg-6 col-md-6 col-sm-12 col-sx-12">
+            
+            <% if(error){%>
+                <p class="servermsg" ><%= error %></p>
+            <%} %>
+            <p id="localmsg" class="servermsg" style="display: none;"></p>
+            
+                
+            <div> <label for="loginform"><h3>Account Login</h3></label> </div>
+            <div class="col-lg-12 col-md-12" style="padding: 0px;">
+                <form  id="loginform" style="text-align: center" autocomplete="off">
+                    <input style="float:left" class="form-element col-lg-6 col-md-6 col-sm-12" type="text" id="username" placeholder="example.123@xyz.com">
+                    <input style="float: right" class="form-element col-lg-5 col-md-5 col-sm-12" type="password" id="userpass" placeholder="password "><br/>
+                    <br style="clear: both"/><br><p >New User Sign up <a href="register" id="forgetpass" >here..</a></p>
+                    <input type="submit" id="loginsubmit" value="Sign In">
+                </form>
+            </div> 
+                                
+        </div>
+    </div>     
+</div>
+<% include ../res/footer.ejs %>
+
+
+
+
+<script>
+     $(document).ready(function() {  
+
+        var uname = $("#username");
+        var upass =  $("#userpass");
+        var formVar = $("#loginform");
+        var messageBox = $("#servermsg");
+        var forgetpass = $("#forgetpass");
+        //var clientSocket = io.connect();
+
+        forgetpass.click((e)=>{
+           // e.preventDefault();
+        });
+
+        formVar.submit((e)=>{
+           //messageBox.html("");
+            e.preventDefault();
+            $.post("/afterlogin", {username : uname.val(), userpass:upass.val()}, (status)=>{
+                
+                //alert(status);
+                if(status=="true"){
+                    
+                    messageBox.html("hello " + uname.val() +" !");
+                    window.location.replace("../dashboard");
+                    //alert("working!!");
+                }
+                else{
+                    messageBox.css("display","block");
+                    $("#localmsg").css("display","block");
+                    $("#localmsg").html('Username or Password incorrect');
+                }
+                uname.val('');
+                upass.val('');
+            }); 
+        });
+
+
+     });
+</script>
