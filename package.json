@@ -1,16 +1,12 @@
-"scripts": {
-  "start": "node server.js"
-},
-"main": "server.js",
-
 {
   "name": "firstnodeapp",
   "version": "1.0.0",
   "description": "my first node application",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+     "start": "node app.js"
   },
+  
   "author": "Vikas Kumar Ratre",
   "license": "ISC",
   "dependencies": {
