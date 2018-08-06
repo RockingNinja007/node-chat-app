@@ -62,7 +62,11 @@
             usersConnected.html("");
             data.forEach(element => {
                 usersConnected.append("<div class='user_element' style='width:fit-content'>"+
+<<<<<<< HEAD
                     "<div class='users_status' name='demo work'><span class='users_name'>"+element.replace("%40","@")+"</span><span class='users_online_status'>(online)</span></div>"+
+=======
+                    "<div class='users_status' name='demo work'><span class='users_name'>"+element+"</span><span class='users_online_status'>(online)</span></div>"+
+>>>>>>> 176cb60b14db7d8373ac4330ffc6c0b133f357d6
                     "<div class='users_chat_box hide' style='margin-left:10px;'>"+
                         "<div class='close_parent glyphicon glyphicon-remove' style='float:right'></div><br/>"+
                         "<div id='"+element.substring(0, element.indexOf("%40"))+"' class=' chat_section' style='margin-bottom:5px;padding: 10px;height:30vh;overflow: scroll;width: 100%; '>"+
