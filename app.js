@@ -23,12 +23,7 @@ var socketUsers = [];
 
 
 //listning the server
-var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-var server_ip_address = process.env.OPENSHIFT_NODEJS_IP;
- 
-server.listen(server_port, server_ip_address, function () {
-  //console.log( "Listening on " + server_ip_address + ", port " + server_port )
-});
+server.listen(5000);
 
 // setting up session middleware
 app.use(session({secret: 'secretdata'}));
@@ -70,6 +65,7 @@ app.post("/afterlogout",(req,res)=>{
 
 //===================== evnt handling after a new user is registered ===================
 app.post("/afterRegstration",(req,res)=>{
+   // console.log("working");
     req.on('data', (data)=>{
         var dat = ""+data;
         var username = JSON.parseLookup(JSON.parseLookup(dat, '&')[0], '=')[1];
@@ -201,7 +197,7 @@ io.sockets.on('connection', (socket) =>{
 
     // ========================== when user sends private message ====================================
     socket.on("private_message_sending",(data)=>{
-       // console.log(data.to+" : "+data.msg);
+        console.log(data.to+" : "+data.msg);
         var indexOfUSer = socketUsers.findIndex(socketUsers => socketUsers.name === data.to);
         //socket.emit("private_msg_recieve",{user: socket.nickname,msg :data.msg});
         socketUsers[indexOfUSer].userSocket.emit("private_msg_recieve",{user: socket.nickname,msg :data.msg});

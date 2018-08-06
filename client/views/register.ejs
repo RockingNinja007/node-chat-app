@@ -10,7 +10,7 @@
                 <%}%>
                 <h2> Sign In</h2>
 
-
+                <p class="servermsg" id="submit_error_msg" style="display: none;"></p>
                 <form id="registerform">
                     
                     <label for="username">Username<span style="color:red;font-size: 18px;">*</span></label><br/>
@@ -59,7 +59,7 @@
                         </div> <br/>                   
                         <div class="input_error_message hide"></div>
                     </div> <br/> 
-                    <input class="submit_button" type="submit" value="register!">
+                    <input id="submit_form" class="submit_button" type="submit" value="register!">
                 </form>
 
             </div>
@@ -82,23 +82,34 @@
         var servermsg = $("#servermsg");
         var contact = $("#contact");
         var address = $("#address");
-        registerform.submit((e)=>{
-            e.preventDefault();
-            var data = {
-                username : username.val(), 
-                userpass:Password.val()
-            };
+        var submit_error_msg = $("#submit_error_msg");
 
-            $.post("/afterRegstration", data, (status)=>{
-                //servermsg.html(status);
-                if(status === 'ok'){
-                    alert("User registered sucessfully");
-                    window.location.replace("../");
-                }
-                username.val("");
-                Password.val("");
-                //if()
-            });
+        $("#submit_form").click((e)=>{
+            var status = vaidate_user();
+            if(status != ""){
+                //return;
+                submit_error_msg.toggleClass("show",true);
+                submit_error_msg.text(status);
+            }
+            else{
+                //alert('working');
+                e.preventDefault();
+                var data = {
+                    username : username.val(), 
+                    userpass:Password.val()
+                };
+
+                $.post("/afterRegstration", data, (status)=>{
+                    //servermsg.html(status);
+                    if(status === 'ok'){
+                        alert("User registered sucessfully");
+                        window.location.replace("../");
+                    }
+                    username.val("");
+                    Password.val("");
+                    //if()
+                });
+            }            
         });
 
         $(".toggletext").click(function(){
@@ -117,6 +128,8 @@
         $(".may_have_error").focusout(function(){
             var error_message_to = $(this).parent(".input_parent");
             var message ="";
+           // alert($(this).attr("id"));
+            
             if($(this).val() == ""){
                 message = "field can't be left empty";
             }
@@ -127,6 +140,7 @@
                 message = validate_password();
             }
             else if($(this).attr("id") == confpass.attr("id")){
+               // alert("working");
                 message = validate_conf_password();
             }
             else{
@@ -158,15 +172,17 @@
             var check_format =/^(([a-zA-Z]{6,}))$/;
             var result= check_format.test(Password.val());
             if(!result){
-                return "enter a string of lenght 6";
+                return "password should be a string of lenght 6";
             }
             else{
                 return "";
             }
         }
-        function validate_conf_password(){
+        /* function validate_conf_password(){
             //var check_format = password.val();
             //var result= check_format.test(Password.val());
+
+            alert(confpass.val() +" :"+ password.val());
             var a=confpass.val(); 
             if(a != password.val()){
                 return "password dosen't match";
@@ -174,7 +190,21 @@
             else{
                 return "";
             }
-        }            
+        }    */
+        
+        
+        function vaidate_user(){
+            var message ="";
+            var tempmesage =validate_user_name(); 
+            if(tempmesage!=""){
+                message = tempmesage;
+                //return;
+            }
+            else{
+                message = validate_password();
+            }
+            return message;
+        }
      });
 
 </script>
