@@ -1,2 +1,2 @@
 
-var defaultPath= "./views/index.html";
+var defaultPath= "app.js";
