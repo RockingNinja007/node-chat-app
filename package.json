@@ -1,5 +1,5 @@
 {
-  "name": "firstnodeapp",
+  "name": "node-chat-app",
   "version": "1.0.0",
   "description": "my first node application",
   "scripts": {
