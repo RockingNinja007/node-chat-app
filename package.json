@@ -1,22 +1,31 @@
 {
-  "name": "node-chat-app",
+  "name": "firstnodeapp",
   "version": "1.0.0",
   "description": "my first node application",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "app.js"
   },
   "main": "app.js",
   "author": "Vikas Kumar Ratre",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "bootstrap": "^4.1.3",
+    "bootstrap": "^4.1.2",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
-    "jquery": "^3.3.1",
     "json": "^9.0.6",
-    "socket.io": "^2.1.1"
-  }
+    "socket.io": "^2.1.1",
+    "nodemon": "^5.6.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RockingNinja007/node-chat-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RockingNinja007/node-chat-app/issues"
+  },
+  "homepage": "https://github.com/RockingNinja007/node-chat-app#readme"
 }
