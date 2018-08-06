@@ -4,7 +4,7 @@
   "description": "my first node application",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "app.js"
+    "start": "node app.js"
   },
   "main": "app.js",
   "author": "Vikas Kumar Ratre",
@@ -18,14 +18,5 @@
     "json": "^9.0.6",
     "socket.io": "^2.1.1",
     "nodemon": "^5.6.0"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/RockingNinja007/node-chat-app.git"
-  },
-  "bugs": {
-    "url": "https://github.com/RockingNinja007/node-chat-app/issues"
-  },
-  "homepage": "https://github.com/RockingNinja007/node-chat-app#readme"
+  } 
 }
