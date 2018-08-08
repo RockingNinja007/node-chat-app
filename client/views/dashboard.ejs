@@ -1,5 +1,6 @@
 <% include ../res/header.ejs %>
 <% include ../res/navbar.ejs %>
+
 <div id="container" class="col-lg-12 col-md-12 col-sm-12 col-sx-12" style="padding: 65px 20vw">
     
     <div id="dashboardcontainer"  class="col-lg-6  col-md-6 col-sm-6 col-sx-6" style="float: left;">
@@ -61,11 +62,16 @@
         clientSocket.on("user status changed",(data)=>{
             usersConnected.html("");
             data.forEach(element => {
+
+                var chat_box_id = element.substring(0, element.indexOf("%40"));
+                if(chat_box_id.indexOf(".") != -1){
+                    chat_box_id = chat_box_id.replace(".","_");
+                }
                 usersConnected.append("<div class='user_element' style='width:fit-content'>"+
                     "<div class='users_status' name='demo work'><span class='users_name'>"+element.replace("%40","@")+"</span><span class='users_online_status'>(online)</span></div>"+
                     "<div class='users_chat_box hide' style='margin-left:10px;'>"+
                         "<div class='close_parent glyphicon glyphicon-remove' style='float:right'></div><br/>"+
-                        "<div id='"+element.substring(0, element.indexOf(".")).toString()+"' class=' chat_section' style='margin-bottom:5px;padding: 10px;height:30vh;overflow: scroll;width: 100%; '>"+
+                        "<div id='"+chat_box_id+"' class=' chat_section' style='margin-bottom:5px;padding: 10px;height:30vh;overflow: scroll;width: 100%; '>"+
                         "</div>"+
                         "<input style='width:200px;' class='users_p_chat_msg' type='text' size='6' autocomplete='off' placeholder='write ur msg here'>"+
                         "<button class='users_p_chat_submit_btn' type='button'>"+
@@ -110,8 +116,12 @@
 
 //======================= event to handle when personal chat is recieved from the server socket ============
         clientSocket.on("private_msg_recieve", (data)=>{
-            var toadd = (data.user).substring(0, data.user.indexOf("."));
-           // alert((data.user).substring(0, data.user.indexOf(".")));
+           
+            var toadd = (data.user).substring(0, (data.user).indexOf("%40"));
+            if(toadd.indexOf(".")){
+                toadd = toadd.replace(".","_");
+            }
+            //alert(toadd);           
             $("#"+toadd).append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
             $("#"+toadd).animate({scrollTop: $("#"+toadd)[0].scrollHeight},200);    
             //$("#"+data.user).append("<div style='float:left;width: 0;height: 0;border-top: 6px solid transparent;border-bottom: 6px solid transparent;border-right:15px solid gray;'></div><div style='float:left;border-radius: 0px 10px 10px 10px;background-color: gray;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.user+"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div style='font-style: italic;'>"+data.msg+"</div></div><br style='clear:left'/><br>");
