@@ -44,12 +44,12 @@ body{
 .loginform{
     display: block;
     border-radius: 10px;
-
 }
 .maincontainer{
     position: relative;
 }
 .maincontainer>div{
+    display: block;
     height: 100vh;
 }
 
@@ -374,21 +374,21 @@ nav{
     border: none; 
     border-radius: 3px;
     background-color: transparent !important;
-    color: aliceblue;
-    border-bottom: 1px solid #ccc;
+    color: aliceblue;/* 
+    border-bottom: 1px solid #ccc; */
     height: 30px;
     color: #444;
     font-size: .9em;
 }
 
 .users_p_chat_msg:hover{
-    border-bottom: 1px solid transparent;
+   /*  border-bottom: 1px solid transparent; */
     transition-duration : 100ms;  
 }
 
 .users_p_chat_msg:focus{
     outline: none;
-    border-bottom: 1px solid transparent;
+   /*  border-bottom: 1px solid transparent; */
     transition-duration : 100ms;  
    
 }
@@ -422,3 +422,5 @@ nav{
  
  }
  
+
+ /*===================================== footer styling =============== */
