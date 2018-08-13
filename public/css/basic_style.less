@@ -1,0 +1,138 @@
+.footer-container{
+    div{
+        color:blue;
+    }
+}
+
+
+.chat_group_list_element{
+    height: 50px;
+   /*  background-color:  rgba(255, 255, 255, 0.65); */
+    background: transparent;
+    margin: none; 
+    /* box-shadow: 0 8px 6px -4px rgba(0, 0, 0, 0.35); */
+    border-top-right-radius: 5px;
+    text-align: center;
+    padding:10px;
+    letter-spacing: .1ch;
+    color: rgb(0, 0, 0);
+    font-weight: bolder;
+    text-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+             0px 8px 13px rgba(0,0,0,0.1),
+             0px 18px 23px rgba(0,0,0,0.1);
+}
+
+.chat_group_list_element:hover{
+    /* back */
+    background-color:  rgba(255, 255, 255, 0.65);
+    box-shadow:  5px 5px 3px rgba(0, 0, 0, 0.35);
+    animation-name: anim-nav-menu;
+    animation-duration: 500ms;
+}
+
+#userGroups{
+    .chat_group_list_element{
+        border-top-right-radius: 0px;
+    }
+}
+
+.group_list_tab_style{
+    background-color:  rgba(255, 255, 255, 0.6);
+     /*    box-shadow: 0 8px 6px -4px rgba(0, 0, 0, 0.35); */
+}
+
+.group_chat_header{
+   
+    div{
+        padding: 10px 5px;
+        width: fit-content;
+        display: block;
+        float: right;
+        padding-bottom: 7px;
+        margin-bottom :3px;
+        font-weight: bolder;
+        line-height: 1em;
+        text-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+             0px 8px 13px rgba(0,0,0,0.1),
+             0px 18px 23px rgba(0,0,0,0.1);
+       
+    }
+    .chat_header_links{
+       
+        background-color:  rgba(255, 255, 255, 0.65);
+        border-top-left-radius: 10px;      
+        border-top-right-radius: 10px;
+        margin-right: 5px;
+    }
+    .chat_header_links:hover{
+        background: blue;
+        color:#fff;
+        box-shadow:  5px 5px 3px rgba(0, 0, 0, 0.35);
+        transition-duration: 200ms;
+    }
+   
+}
+.participants_section{
+    width: 100%;    
+    overflow: hidden;
+    border-radius: 5px;
+    padding:10px;
+    background-color:rgba(253, 253, 253, 0.6);
+    box-shadow: 0 8px 6px -4px rgba(0, 0, 0, 0.35);
+}
+.participants_section::-webkit-scrollbar{
+    display: none;
+}
+
+.change_to_red{
+    background: rgba(255, 0, 0, 0.5) !important;
+    color:#fff;
+}
+
+.users_group_chat_box{
+    background-color:  rgba(255, 255, 255, 0.65);
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 5px ;
+    box-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+    0px 8px 13px rgba(0,0,0,0.1),
+    0px 18px 23px rgba(0,0,0,0.1);
+}
+.users_g_chat_msg{
+    border: none; 
+    border-radius: 3px;
+    background-color: transparent !important;
+    color: aliceblue;/* 
+    border-bottom: 1px solid #ccc; */
+    height: 30px;
+    color: #444;
+    font-size: .9em;
+}
+
+.users_g_chat_msg:hover{
+   /*  border-bottom: 1px solid transparent; */
+    transition-duration : 100ms;  
+}
+
+.users_g_chat_msg:focus{
+    outline: none;
+   /*  border-bottom: 1px solid transparent; */
+    transition-duration : 100ms;  
+   
+}
+.users_g_chat_submit_btn{
+    background-color: rgb(255, 0, 0);
+    border:none;
+    box-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+    0px 8px 13px rgba(0,0,0,0.1),
+    0px 18px 23px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    padding: none;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+}
+
+.users_g_chat_submit_btn>span{
+    color:rgb(0, 0, 0);
+}

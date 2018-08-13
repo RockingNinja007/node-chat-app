@@ -145,7 +145,7 @@ input:-webkit-autofill:active  {
     -webkit-text-fill-color: #fff !important;
 }
 
-#loginsubmit{   
+.submit_button{   
     font-size: 1.1em;
     text-transform: uppercase; 
     border: 1px solid transparent;
@@ -158,7 +158,6 @@ input:-webkit-autofill:active  {
        
     color: aliceblue;
     font-weight: bolder;
-    letter-spacing: .2ch;
     text-shadow: 0px 4px 3px rgba(0,0,0,0.4),
              0px 8px 13px rgba(0,0,0,0.1),
              0px 18px 23px rgba(0,0,0,0.1);
@@ -166,7 +165,7 @@ input:-webkit-autofill:active  {
     outline: none;
     background-color: rgba(0, 81, 255, 0.658) !important;
 }
-#loginsubmit:hover{
+.submit_button:hover{
     animation-name:  anim-nav-menu;
     background: #c00 !important;
     transition-duration: 300ms;    
@@ -175,8 +174,6 @@ input:-webkit-autofill:active  {
              0px 18px 23px rgba(0,0,0,0.1);
     box-shadow: 3px 4px 3px rgba(0, 0, 0, 0.5);
 }
-
-
 
 /*login styling ends here */
 
@@ -322,9 +319,9 @@ nav{
 /* chat section styling */
 #chatsection{
     padding: 20px 10px;
-    box-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+    /* box-shadow: 0px 4px 3px rgba(0,0,0,0.4), 
     0px 8px 13px rgba(0,0,0,0.1),
-    0px 18px 23px rgba(0,0,0,0.1);
+    0px 18px 23px rgba(0,0,0,0.1);*/
 }
 
 #chatsection::-webkit-scrollbar { 
@@ -340,9 +337,7 @@ nav{
     border-radius: 5px;
     padding:10px;
     background-color: #fdf7f7a1;
-    box-shadow: 0px 4px 3px rgba(0,0,0,0.4),
-    0px 8px 13px rgba(0,0,0,0.1),
-    0px 18px 23px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 6px -4px rgba(0, 0, 0, 0.35);
 }
 
 .chat_section::-webkit-scrollbar{
@@ -404,6 +399,7 @@ nav{
     width: 30px;
     margin-left: 5px;
 }
+
 .users_p_chat_submit_btn>span{
     color:rgb(0, 0, 0);
 }
@@ -420,7 +416,7 @@ nav{
         top: 0px;
     }
  
- }
+}
  
 
- /*===================================== footer styling =============== */
+ 

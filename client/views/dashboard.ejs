@@ -1,27 +1,42 @@
 <% include ../res/header.ejs %>
 <% include ../res/navbar.ejs %>
 
-<div id="container" class="col-lg-12 col-md-12 col-sm-12 col-sx-12" style="padding: 65px 20vw">
+<div id="container" class="col-lg-12 col-md-12 col-sm-12 col-sx-12" style="padding: 65px 5vw">
     
-    <div id="dashboardcontainer"  class="col-lg-6  col-md-6 col-sm-6 col-sx-6" style="float: left;">
-            <% if(uname){%> 
-                <p><b>Hello</b><span class="servermsg"><%= uname.replace("%40","@") %></span>  <span id="servermsg" class="servermsg" style="display:none;"><%= uname %></span> !!</p><br/>
-            <%}%>            
-            <input type="button" id="startCahtBtn" value="start chat" style="margin: 10vh;display: none;">
-            <div id="usersConnected" style=" text-align: left ;color: #000;font-weight: bold">
-                <!-- users connected to socket will be shown here -->               
-               
-            </div>
+    <div id="dashboardcontainer"  class="col-lg-6  col-md-6 col-sm-12 col-sx-12" style="float: left;padding-left:15vw">
+        <% if(uname){%> 
+            <p><b>Hello</b><span class="servermsg"><%= uname.replace("%40","@") %></span>  <span id="servermsg" class="servermsg" style="display:none;"><%= uname %></span> !!</p><br/>
+        <%}%>            
+        <input type="button" id="startCahtBtn" value="start chat" style="margin: 10vh;display: none;">
+        <div id="usersConnected" style=" text-align: left ;color: #000;font-weight: bold">
+            <!-- users connected to socket will be shown here -->                           
+        </div>
     </div>    
     
-    <div id="chatcontainer" style="display: block;float: right;"  class="col-lg-6  col-md-6 col-sm-6 col-sx-6">
-            <% include ./chatView.ejs %>
+    <div id="chatcontainer" style="display: block;float: right;"  class="col-lg-6  col-md-6 col-sm-12 col-sx-12">
+        <div class="group_chat_container_parent col-lg-6  col-md-6 col-sm-6 col-sx-6" style="padding: 0px;float: left;">
+            <div id="general_chat_container" class="group_chat_container_element">
+                <% include ./chatView.ejs %>
+            </div> 
+        </div>
+        <div id="group_panel_container" class="group_chat_container_parent hide col-lg-6  col-md-6 col-sm-6 col-sx-6 " style="padding: 0px;float: left;">
+            <!-- here all the groups chat pannel will be displayed -->
+        </div>
+        <div id="chat_group_list" class="col-lg-6  col-md-6 col-sm-6 col-sx-6" style="border: 0px solid #000;padding: 0px;float:right;">
+            <button id="create_new_group" class="submit_button" style="text-transform: capitalize !important ;margin:0px 10px 5px 10px;">create new group <span class="	glyphicon glyphicon-plus" style="float: right;"></span> </button>
+            <div id="tab_for_general" class="chat_group_list_element group_list_tab_style">general</div>
+            <div id="userGroups">
+                <!-- all user group created will be displayed here -->
+            </div>
+        </div> 
+        
+        
     </div>
 
 </div>
 
- 
-<% include ../res/footer.ejs %>
+ <!-- 
+<% include ../res/footer.ejs %> -->
 
 <script>
 
@@ -38,7 +53,7 @@
         var clientSocket;
         var chatsection = $("#chatsection");
         var servermsg = $("#servermsg");
-        var servermsg = $("#servermsg");
+        var create_new_group = $("#create_new_group");
 
  //==================== connecting to socket ==================================
 
@@ -47,6 +62,20 @@
 //======================= adding a user as soon as page loads =========================
 
         clientSocket.emit("add user",{user : servermsg.html().toString()});
+
+ //================================= on new group button pressed================================= 
+ 
+        create_new_group.click(function(){
+            var group_name = prompt("Enter a group name....");
+            if(group_name=="" || group_name == null){
+                alert("group name cannot be empty");
+            }else{
+                if(group_name.replace(" ","_").indexOf(" ")==-1){
+                    clientSocket.emit("add_new_group",{name : group_name});
+                }
+                else{alert("group name cannot have more than one space");}
+            }            
+        });
         
 // ======================= not required really =======================
 
@@ -60,18 +89,20 @@
 //==================== event to handle if any user logges in or out from the socket ===============
 
         clientSocket.on("user status changed",(data)=>{
-            usersConnected.html("");
+            //usersConnected.html("");
             data.forEach(element => {
 
                 var chat_box_id = element.substring(0, element.indexOf("%40"));
                 if(chat_box_id.indexOf(".") != -1){
                     chat_box_id = chat_box_id.replace(".","_");
                 }
-                usersConnected.append("<div class='user_element' style='width:fit-content'>"+
+                // ============ adding user to the list if the user field is not availabale =============
+                if($("#"+chat_box_id).length === 0){
+                    usersConnected.append("<div class='user_element p_chat_popups' style='width:fit-content'>"+
                     "<div class='users_status' name='demo work'><span class='users_name'>"+element.replace("%40","@")+"</span><span class='users_online_status'>(online)</span></div>"+
                     "<div class='users_chat_box hide' style='margin-left:10px;'>"+
-                        "<div class='close_parent glyphicon glyphicon-remove' style='float:right'></div><br/>"+
-                        "<div id='"+chat_box_id+"' class=' chat_section' style='margin-bottom:5px;padding: 10px;height:30vh;overflow: scroll;width: 100%; '>"+
+                        "<div class='close_parent glyphicon glyphicon-remove' style='box-shadow:1px 1px 2px #000;float:right; padding:3px ; background: rgba(255, 0, 0, 1)'></div><br/>"+
+                        "<div id='"+chat_box_id+"_chat_section' class=' chat_section' style='margin-bottom:5px;padding: 10px;height:30vh;overflow: scroll;width: 100%; '>"+
                         "</div>"+
                         "<input style='width:200px;' class='users_p_chat_msg' type='text' size='6' autocomplete='off' placeholder='write ur msg here'>"+
                         "<button class='users_p_chat_submit_btn' type='button'>"+
@@ -79,26 +110,29 @@
                         "</button>"+
                     "</div><br/>"+
                 "</div>");
+                }                
             });
-
+            //============= event to hide chatbody when cross butotn is pressed ================
             $(".close_parent").click(function(){
-                $(this).parent(".users_chat_box").toggleClass("show");
+                $(this).parent(".users_chat_box").addClass("hide");
             });
             
-//===================== event to display chat box for personal chat ==========================
+            //===================== event to display chat box for personal chat ==========================
             $(".users_status").click(function(){
                 //alert($(this).children('span').html());
                 //$(".users_chat_box")
+                $(".users_chat_box").addClass("hide");
+                $(this).siblings(".users_chat_box").removeClass("hide");
                 var usertosend =$(this).children('span').html(); 
-                $(this).siblings('.users_chat_box').toggleClass("show");
+                //$(this).siblings('.users_chat_box').toggleClass("show");
                 var submit_button = $(this).siblings('.users_chat_box').children(".users_p_chat_submit_btn");
                 submit_button.click(function(e){
                    // alert($(this).siblings(".users_p_chat_msg").val());
                     var message = ''+$(this).siblings(".users_p_chat_msg").val().toString();
                     if(message!=''){
+                        $(this).siblings(".chat_section").append("<div style='border-radius: 10px 0px 10px 10px;background-color: green;padding: 5px;color: azure;width: fit-content;float:right'> <div class='chat_elements'>"+$(this).siblings(".users_p_chat_msg").val()+"</div></div><br style='clear: right'/><br/>");
                         clientSocket.emit("private_message_sending",{to:usertosend.replace("@","%40"),msg:message});
                     }                 
-                    $(this).siblings(".chat_section").append("<div style='border-radius: 10px 0px 10px 10px;background-color: green;padding: 5px;color: azure;width: fit-content;float:right'> <div class='chat_elements'>"+$(this).siblings(".users_p_chat_msg").val()+"</div></div><br style='clear: right'/><br/>");                    
                     $(this).siblings(".users_p_chat_msg").val("");
                 });
             });
@@ -122,8 +156,8 @@
                 toadd = toadd.replace(".","_");
             }
             //alert(toadd);           
-            $("#"+toadd).append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
-            $("#"+toadd).animate({scrollTop: $("#"+toadd)[0].scrollHeight},200);    
+            $("#"+toadd+"_chat_section").append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
+            $("#"+toadd+"_chat_section").animate({scrollTop: $("#"+toadd)[0].scrollHeight},200);    
             //$("#"+data.user).append("<div style='float:left;width: 0;height: 0;border-top: 6px solid transparent;border-bottom: 6px solid transparent;border-right:15px solid gray;'></div><div style='float:left;border-radius: 0px 10px 10px 10px;background-color: gray;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.user+"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div style='font-style: italic;'>"+data.msg+"</div></div><br style='clear:left'/><br>");
         });
 
@@ -137,6 +171,139 @@
             }
             //smooth scroling chatsection 
             $("#chatsection").animate({scrollTop: $("#chatsection")[0].scrollHeight},200);
+        });
+
+// ==================== handling any message form socket ===================
+        clientSocket.on("socket_error_msg",(data)=>{
+            alert(data.msg);
+        });
+
+// ==================== even to handle if group list is updated in socket =================
+        clientSocket.on("Group_list_update" ,(data)=>{
+            //display_general_chat();
+           /*  $("#userGroups").html("");
+            $("#group_panel_container").html(""); */
+            data.forEach(element => {
+                if($("#"+element.replace(" ","_")).length === 0){
+                    //================= making link to naviage from group to group =============               
+                    $("#userGroups").append("<div class='chat_group_list_element' >"+ element.replace("_"," ") +"</div>");
+                    
+                    //============ containers for every group that is connected in the socket =============
+                    $("#group_panel_container").append(
+                        "<div class='hide group_chat_container_element' id='"+ element.replace(" ","_")+"'>"+
+                            "<div style='height: 60vh;max-width: 100%;'>"+
+                                "<div style='margin-bottom:10px;'>"+
+                                    "<div style='width: 100%;'>"+
+                                        "<div class='group_chat_header'>"+
+                                            "<div style='float:left'><p>"+ element +"</p></div> "+
+                                            "<div class='chat_header_links '><p>Participants</p></div>"+
+                                            "<div class='chat_header_links change_to_red'><p>Chat Box</p></div>"+
+                                        "</div>"+
+                                        "<div id='"+element.replace(" ","_")+"_chatbox' class='chat_section' style='padding: 10px;height:60vh;overflow: scroll;width: 100%; '>"+
+                                            "<!-- all the group messge from secket will be shown here -->"+
+                                        "</div>"+
+                                        "<div  class='participants_section hide' style='text-align:center;padding: 10px;height:60vh;overflow: scroll;width: 100%; '>"+
+                                            "<button name='add_member_to_"+element.replace(" ","_")+"' class='add_new_participant' class='' style='padding: 10px; text-transform: capitalize !important ;margin:10px !important'>add new participant<span class='	glyphicon glyphicon-plus' style='float: right;margin:0px 10px;'></span> </button>"+
+                                            "<p>List of participants</p><br/>"+
+                                            "<div id='"+element.replace(" ","_")+"_participants_list'> nbnbflknbfl </div>"+
+                                        "</div>"+
+                                "</div></div>"+
+
+                                "<div >"+
+                                    "<form>"+
+                                        "<div class='users_group_chat_box' style='width: 100%;'>"+
+                                            "<input class='users_g_chat_msg' type='text' style='width: 60%' placeholder='enter any msg here'>"+
+                                            "<button class='users_g_chat_submit_btn group_messagesend' name='"+ element.replace(" ","_") +"_send_button' type='submit' style='float: right'>"+
+                                                "<span class='glyphicon glyphicon-send'></span>"+
+                        "</button></div></form></div></div></div>"
+                    );
+                }                
+            });  
+
+            //==================== event to add member in the group  =======================
+            $(".add_new_participant").click(function(){
+                var p_to_add = prompt("add th eusers name");
+                if(p_to_add == "" || p_to_add ==null){
+                    alert("participant name cannot be empty");
+                }
+                else{
+                    var gorup_name = $(this).attr("name").substring(14).replace("_"," ");
+                    clientSocket.emit("add_participant", {p_name:p_to_add.replace("@","%40"),grp_name:gorup_name}, (feedback)=>{
+                        alert(feedback);
+                    });
+                }                
+            });
+            
+            // =================== swapping between chat box and participants list ==================
+            $(".chat_header_links").click(function(){
+                $(this).siblings(".chat_header_links").removeClass("change_to_red");
+                $(this).addClass("change_to_red");
+                if($(this).children("p").text()=="Participants"){
+                    $(this).parent(".group_chat_header").siblings(".chat_section").addClass("hide");
+                    $(this).parent(".group_chat_header").siblings(".participants_section").removeClass("hide");
+                }
+                if($(this).children("p").text()=="Chat Box"){
+                    $(this).parent(".group_chat_header").siblings(".chat_section").removeClass("hide");
+                    $(this).parent(".group_chat_header").siblings(".participants_section").addClass("hide");
+                }
+            });   
+            // ====================== event ot handle when group is selected ===================
+            $(".chat_group_list_element").click(function(){
+            //e.preventDefault();
+                //alert("clicked");
+                $(".chat_group_list_element").removeClass("group_list_tab_style");
+                $(this).toggleClass("group_list_tab_style");
+
+                // =============== switching group containers when a group name is clicked ================                               
+                if($(this).text() == "general"){
+                    display_general_chat();
+                }
+                else{
+                    $(".group_chat_container_element").parent(".group_chat_container_parent").addClass("hide");
+                    $(".group_chat_container_element").addClass("hide");
+                    $("#"+$(this).text().replace(" ","_")).parent(".group_chat_container_parent").toggleClass("hide");
+                    $("#"+$(this).text().replace(" ","_")).toggleClass("hide");
+                }
+            });
+            // ================= function to set default group chat section to be general chat ============
+            function display_general_chat(){
+                $("#tab_for_general").addClass("group_list_tab_style");
+                $("#group_panel_container").addClass("hide");
+                $("#general_chat_container").parent(".group_chat_container_parent").removeClass("hide");
+                $("#general_chat_container").removeClass("hide");
+            }
+
+            //==================== event to handle when user send a group message =================
+            $(".group_messagesend").click(function(e){
+                e.preventDefault();
+                var msg = $(this).siblings(".users_g_chat_msg").val();
+                $(this).siblings(".users_g_chat_msg").val("");
+                if(msg!=""){
+                    var grp_name = $(this).attr("name").substring(0,($(this).attr("name").length-12)).replace("_"," ");
+                    clientSocket.emit("group_message_send", {grp_name:grp_name,sender_name:servermsg.html().toString(),msg:msg}, (recievedData)=>{
+                        //============== event after message is send to the socket and responce is recieved ======================
+                        //============ space for future releases  =================
+                    });
+                }
+                 //alert(msg);
+            });
+
+        });
+
+//================= event to handle when group message is recieved =========================
+        clientSocket.on("grp_message_delivery",(data)=>{
+            //=========== displaying the message in the respective group ============
+            //$("#"+data.grp_name+"_chatbox").append("message recieved : "+data.msg+"<br/>");
+            var currentbox = $("#"+data.grp_name.replace(" ","_")+"_chatbox");
+            if(data.sender_name === servermsg.html()){
+                currentbox.append("<div style='border-radius: 10px 0px 10px 10px;background-color: green;padding: 5px;color: azure;width: fit-content;float:right'> <div class='chat_elements'>"+data.msg+"</div></div><br style='clear: right'/><br/>");    
+            }
+            else{
+                currentbox.append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.sender_name.replace("%40","@")+"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
+            }
+            //smooth scroling chatsection 
+            currentbox.animate({scrollTop: currentbox[0].scrollHeight},200);
+
         });
 
 //===================== prevent navbar links to refresh page on clicked =====================
@@ -155,7 +322,29 @@
                 }
             });
         });
+
+// =================== swapping between chat box and participants list ==================
+        $(".chat_header_links").click(function(){
+            $(this).siblings(".chat_header_links").removeClass("change_to_red");
+            $(this).addClass("change_to_red");
+            if($(this).children("p").text()=="Participants"){
+                $(this).parent(".group_chat_header").siblings(".chat_section").addClass("hide");
+                $(this).parent(".group_chat_header").siblings(".participants_section").removeClass("hide");
+            }
+            if($(this).children("p").text()=="Chat Box"){
+                $(this).parent(".group_chat_header").siblings(".chat_section").removeClass("hide");
+                $(this).parent(".group_chat_header").siblings(".participants_section").addClass("hide");
+            }
+        });       
         
+// ===================== event to handle if user list for a group is updated =====================
+    clientSocket.on("Group_participant_list_update" , (data)=>{
+        $("#"+data.grp_name.replace(" ","_")+"_participants_list").html("");
+        //alert(" : working" );
+        data.participants.forEach(element=>{
+            $("#"+data.grp_name.replace(" ","_")+"_participants_list").append("<div>"+ element.replace("%40","@") +"</div>")
+        });
+    });
 
     });
 </script>

@@ -17,6 +17,8 @@ var encryption_code = "123@viks";
 
 var socketUsers = [];
 
+var user_groups = [];
+
 
 
 //================= middlewared declaration ==========================
@@ -30,12 +32,12 @@ var server_ip_address = process.env.OPENSHIFT_NODEJS_IP;
   //console.log( "Listening on " + server_ip_address + ", port " + server_port )
 });
 
-server.listen(server_port, server_ip_address, function () {
+/* server.listen(server_port, server_ip_address, function () {
     //console.log( "Listening on " + server_ip_address + ", port " + server_port )
-});
- /* 
+}); */
+ 
 server.listen(5000);
- */
+
 // setting up session middleware
 app.use(session({secret: 'secretdata'}));
 
@@ -51,16 +53,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ========================== deafult get request when app starts =======================
 app.get('/',(req,res)=>{
-      if(req.session.username){
+    if(req.session.username){
         res.redirect('/dashboard');
     }else{ 
         res.render('views/login',{error:err});
     }
 }); 
 
+
+// ====================== redirecting to register page ===================================
 app.get('/register',(req,res)=>{
     res.render("views/register", {error: ""});
 });
+
+// ========================== handling logout event ================================================
 
 app.post("/afterlogout",(req,res)=>{
     req.on('data', (data)=>{
@@ -73,7 +79,24 @@ app.post("/afterlogout",(req,res)=>{
         }        
     });
 });
+/* 
+// ===================== event handler to hande new group creation =================================== // need to implement in socket =========================     
+app.post("/add_new_group", (req,res)=>{
+    //console.log("going");
+    req.on("data",(data)=>{
+        var dat = data.toString();
+        var group_object  = {
+            name:dat,
+            users_init:{socket.nickname}
+        }; 
+        //console.log(dat);
+        // ============================== adding group in user group ==============================
+        user_groups.push(group_object);
 
+
+    });
+});
+ */
 //===================== evnt handling after a new user is registered ===================
 app.post("/afterRegstration",(req,res)=>{
    // console.log("working");
@@ -168,6 +191,8 @@ app.get('/*',(req,res)=>{
     //console.log("");
     res.render("res/error404");
  });
+ 
+
 
  //=========================  socket coding =======================
 
@@ -195,10 +220,13 @@ io.sockets.on('connection', (socket) =>{
         
         var date = new Date().toString("yyyyMMddHHmmss").replace(/T/, ' ').replace(/\..+/, '').substring(4);
         console.log(socket.nickname + " connected !! at " +date);
-        fs.appendFileSync("client/res/userlogs.txt","username : "+socket.nickname + " logged at : "+date+",\n");
+        //fs.appendFileSync("client/res/userlogs.txt","username : "+socket.nickname + " logged at : "+date+",\n");
         
         // sending all active users
         sendUsersOnline();
+        update_Group_List_At_USer_Side();
+        update_Group_participant_List_At_USer_Side();
+
     });
 
     //=================== when user sends broadcast message ===================================
@@ -214,6 +242,68 @@ io.sockets.on('connection', (socket) =>{
         //socket.emit("private_msg_recieve",{user: socket.nickname,msg :data.msg});
         socketUsers[indexOfUSer].userSocket.emit("private_msg_recieve",{user: socket.nickname,msg :data.msg});
        
+    });
+
+    
+
+    // =========================== on adding new group to socket =============================
+    socket.on("add_new_group", (data)=>{
+
+        if(data.name != null){
+            var dat = data.name.toString();
+            //console.log(dat);
+            //================= validating if group already exists or not ================
+            var indexOfGroup = user_groups.findIndex(user_groups => user_groups.name === dat);
+            if(indexOfGroup != -1){//=========== if group name alredy exists =========
+                socket.emit("socket_error_msg", {msg :"group already exists. Try another name"});
+            }
+            else{//============== if group name does not exists =============
+                var group_object  = {
+                    name:dat,
+                    users_init:[socket.nickname]
+                }; 
+                user_groups.push(group_object);// adding user created group in socket variable 
+                update_Group_List_At_USer_Side();// updatin group list at users end
+
+                io.sockets.emit("Group_participant_list_update",{grp_name : dat, participants : group_object.users_init});
+            }
+            
+        }
+    });
+    // ==================== on adding a new user to the group ==================
+    socket.on("add_participant",function(data, callback){
+        //====== getting the index of the group =====
+        var indexOfGroup = user_groups.findIndex(user_groups => user_groups.name === data.grp_name);
+        var index_of_user = user_groups[indexOfGroup].users_init.indexOf(data.p_name);
+        if(index_of_user != -1){
+            callback("user already exists");
+        }
+        else{
+            //callback("adding user please wait.....");
+            var indexOfUSer = socketUsers.findIndex(socketUsers => socketUsers.name === data.p_name);
+            if(indexOfUSer==-1){
+                callback("invalid user try a valid user name");
+            }
+            else{
+                user_groups[indexOfGroup].users_init.push(data.p_name);
+                callback("user_added..");   
+                io.sockets.emit("Group_participant_list_update",{grp_name : data.grp_name, participants : user_groups[indexOfGroup].users_init});
+            }
+        }
+    });
+
+    //============================= handling event is user sends an group message ================
+    socket.on('group_message_send', function(data, callback){
+        //console.log(data);
+        //====== getting the index of the group =====
+        var indexOfGroup = user_groups.findIndex(user_groups => user_groups.name === data.grp_name);
+        //========= sending message to every user in the group =================
+        user_groups[indexOfGroup].users_init.forEach(element=>{
+            //============== getting reference of all the members in the group ================
+            var indexofuser = socketUsers.findIndex(socketUsers => socketUsers.name === element);
+            socketUsers[indexofuser].userSocket.emit("grp_message_delivery", data);
+                     
+        });
     });
 
     // =============================== when user disconnects ====================================
@@ -243,6 +333,23 @@ io.sockets.on('connection', (socket) =>{
             onlineUsers.push(element.name);
         });
         io.sockets.emit("user status changed" ,onlineUsers);
+    }
+
+    //======================= function to return all the groups currently made in socket ===================
+    function update_Group_List_At_USer_Side(){
+        var Groups_online = [];
+        user_groups.forEach(element => {
+            /* if(element.name!= socket.nickname) */
+            //console.log(element.name);
+            Groups_online.push(element.name);
+        });
+        io.sockets.emit("Group_list_update" ,Groups_online);
+    }
+    //=================== function to update user list in the currently updated grp ========================
+    function update_Group_participant_List_At_USer_Side(){
+        user_groups.forEach(element=>{
+            io.sockets.emit("Group_participant_list_update",{grp_name : element.name, participants : element.users_init});
+        });
     }
 }); 
  

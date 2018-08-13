@@ -1,21 +1,30 @@
-<div style="height: 60vh;max-width: 100%;">
-    <div style="margin-bottom:10px;">
-        <div style="width: 100%;">
-            <div id="chatsection" class="chat_section" style="padding: 10px;height:60vh;overflow: scroll;width: 100%; ">
+<div style='height: 60vh;max-width: 100%;'>
+    <div style='margin-bottom:10px;'>
+        <div style='width: 100%; '>
+            <div class='group_chat_header'>
+                <div style='float:left'><p>general chat</p></div> 
+                <div class='chat_header_links '><p>Participants</p></div>
+                <div class='chat_header_links change_to_red'><p>Chat Box</p></div>                
+            </div>       
+            <div id='chatsection' class='chat_section' style='padding: 10px;height:60vh;overflow: scroll;width: 100%; '>
                 <!-- all the message broadcasted in secket will be shown here -->
+            </div>
+            <div class='participants_section hide' style='text-align:center;padding: 10px;height:60vh;overflow: scroll;width: 100%; '>
+                <!-- ============== list of participants will be displayed here ============== -->
+                <!-- <button id='add_new_participant' class='' style='padding: 10px; text-transform: capitalize !important ;margin:10px !important'>add new participant<span class='	glyphicon glyphicon-plus' style='float: right;margin:0px 10px;'></span> </button> -->
+                <p>You cannot add aprticipant in this group</p>
+                <br/>Everyone in socket is recieving  this message
             </div>
         </div>
     </div>
     <div >
-        <form id= "sendmsgform">
-            <div class="users_chat_box" style="width: 100%;">
-                <input class="users_p_chat_msg" type="text" id="msg" style="width: 60%" placeholder="enter any msg here">
-                <button class="users_p_chat_submit_btn" type="submit" id="submitBtn" style="float: right">
+        <form id= 'sendmsgform'>
+            <div class='users_group_chat_box' style='width: 100%;'>
+                <input class='users_g_chat_msg' type='text' id='msg' style='width: 60%' placeholder='enter any msg here'>
+                <button class='users_g_chat_submit_btn' type='submit' id='submitBtn' style='float: right'>
                     <span class='glyphicon glyphicon-send'></span>
                 </button>
-            </div>
-            
+            </div>            
         </form>
-    </div>
-    
+    </div>    
 </div>
