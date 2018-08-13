@@ -28,21 +28,16 @@ var user_groups = [];
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP;
 
- server.listen(server_port, server_ip_address, function () {
+server.listen(server_port, server_ip_address, function () {
   //console.log( "Listening on " + server_ip_address + ", port " + server_port )
 });
 
-<<<<<<< HEAD
 /* server.listen(server_port, server_ip_address, function () {
     //console.log( "Listening on " + server_ip_address + ", port " + server_port )
 }); */
- 
-=======
-
- /* 
->>>>>>> 428b13c2bb0df4030a6f1eb942fd317be5c364f8
+/*  
 server.listen(5000);
-
+ */
 // setting up session middleware
 app.use(session({secret: 'secretdata'}));
 
