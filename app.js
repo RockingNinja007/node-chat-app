@@ -298,7 +298,7 @@ io.sockets.on('connection', (socket) =>{
         //========= sending message to every user in the group =================
         user_groups[indexOfGroup].users_init.forEach(element=>{
             //============== getting reference of all the members in the group ================
-            var indexofuser = socketUsers.findIndex(socketUsers => socketUsers.name === element);
+            var indexofuser = socketUsers.findIndex(socketUsers => socketUsers.name === element.user_name);
             socketUsers[indexofuser].userSocket.emit("grp_message_delivery", data);
                      
         });
