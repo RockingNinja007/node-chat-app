@@ -28,16 +28,16 @@ var user_groups = [];
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP;
 
-server.listen(server_port, server_ip_address, function () {
+/* server.listen(server_port, server_ip_address, function () {
   //console.log( "Listening on " + server_ip_address + ", port " + server_port )
-});
+}); */
 
 /* server.listen(server_port, server_ip_address, function () {
     //console.log( "Listening on " + server_ip_address + ", port " + server_port )
 }); */
-/*  
+ 
 server.listen(5000);
- */
+
 // setting up session middleware
 app.use(session({secret: 'secretdata'}));
 
@@ -53,11 +53,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ========================== deafult get request when app starts =======================
 app.get('/',(req,res)=>{
-    if(req.session.username){
+    /* if(req.session.username){
         res.redirect('/dashboard');
-    }else{ 
+    }else{  */
         res.render('views/login',{error:err});
-    }
+    //}
 }); 
 
 
@@ -194,7 +194,7 @@ app.get('/*',(req,res)=>{
  
 
 
- //=========================  socket coding =======================
+//=========================  socket coding =======================
 
 io.sockets.on('connection', (socket) =>{
    //============================= when a new user logs in to the socket( auto after comming to the dashboard) ========================
@@ -205,7 +205,7 @@ io.sockets.on('connection', (socket) =>{
         var indexOfUSer = socketUsers.findIndex(socketUsers => socketUsers.name === data.user);
         
         if(indexOfUSer == -1){
-            var obj = {name:data.user,count:1,userSocket: socket };
+            var obj = {name:data.user,count:1,userSocket: socket};
             socketUsers.push(obj);     
             indexOfUSer++;      
         }
@@ -243,10 +243,7 @@ io.sockets.on('connection', (socket) =>{
         socketUsers[indexOfUSer].userSocket.emit("private_msg_recieve",{user: socket.nickname,msg :data.msg});
        
     });
-
-    
-
-    // =========================== on adding new group to socket =============================
+    //=========================== on adding new group to socket =============================
     socket.on("add_new_group", (data)=>{
 
         if(data.name != null){
@@ -260,7 +257,7 @@ io.sockets.on('connection', (socket) =>{
             else{//============== if group name does not exists =============
                 var group_object  = {
                     name:dat,
-                    users_init:[socket.nickname]
+                    users_init:[{user_name : socket.nickname,type : "admin"}] 
                 }; 
                 user_groups.push(group_object);// adding user created group in socket variable 
                 update_Group_List_At_USer_Side();// updatin group list at users end
@@ -285,8 +282,9 @@ io.sockets.on('connection', (socket) =>{
                 callback("invalid user try a valid user name");
             }
             else{
-                user_groups[indexOfGroup].users_init.push(data.p_name);
+                user_groups[indexOfGroup].users_init.push({user_name:data.p_name,type : "normal"});
                 callback("user_added..");   
+                //var indexOfUserInGroup = user_groups[indexOfGroup].users_init.findIndex(user_groups[indexOfGroup].users_init => user_groups.name === data.grp_name);
                 io.sockets.emit("Group_participant_list_update",{grp_name : data.grp_name, participants : user_groups[indexOfGroup].users_init});
             }
         }
@@ -311,9 +309,11 @@ io.sockets.on('connection', (socket) =>{
         //console.log("user disconnected");       
         var indexOfUSer = socketUsers.findIndex(socketUsers => socketUsers.name === socket.nickname);
         //console.log(socket.nickname+ " at " +socketUsers.indexOf(socket.nickname)+ " disconnected");    
-       // console.log(socketUsers[indexOfUSer].name +" disconnected!! ");
         if(indexOfUSer!=-1){
+            console.log(socketUsers[indexOfUSer].name +" disconnected!! ");
             if(socketUsers[indexOfUSer].count==1){
+                //=================== updating user lst when user is diconected ===================
+                io.sockets.emit("delete_user_form_list",{user:socketUsers[indexOfUSer].name});
                 socketUsers.splice(indexOfUSer,1);
             }
             else{
@@ -321,7 +321,7 @@ io.sockets.on('connection', (socket) =>{
             }
         }
         //sending all active users .
-        sendUsersOnline();
+        //sendUsersOnline();
         //console.log(socketUsers.length + "remianing");
     });
 
@@ -347,9 +347,11 @@ io.sockets.on('connection', (socket) =>{
     }
     //=================== function to update user list in the currently updated grp ========================
     function update_Group_participant_List_At_USer_Side(){
+        var i=0;
         user_groups.forEach(element=>{
+            //console.log( element.users_init);
             io.sockets.emit("Group_participant_list_update",{grp_name : element.name, participants : element.users_init});
+            i++;
         });
     }
 }); 
- 

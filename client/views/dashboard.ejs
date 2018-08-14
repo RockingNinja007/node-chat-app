@@ -5,7 +5,7 @@
     
     <div id="dashboardcontainer"  class="col-lg-6  col-md-6 col-sm-12 col-sx-12" style="float: left;padding-left:15vw">
         <% if(uname){%> 
-            <p><b>Hello</b><span class="servermsg"><%= uname.replace("%40","@") %></span>  <span id="servermsg" class="servermsg" style="display:none;"><%= uname %></span> !!</p><br/>
+            <p><b>Hello  </b><span class=""><b><%= uname.substring(0,uname.indexOf("%40")) %></b> </span>  <span id="servermsg" class="servermsg" style="display:none;"><%= uname %></span> !!</p><br/>
         <%}%>            
         <input type="button" id="startCahtBtn" value="start chat" style="margin: 10vh;display: none;">
         <div id="usersConnected" style=" text-align: left ;color: #000;font-weight: bold">
@@ -97,7 +97,7 @@
                     chat_box_id = chat_box_id.replace(".","_");
                 }
                 // ============ adding user to the list if the user field is not availabale =============
-                if($("#"+chat_box_id).length === 0){
+                if($("#"+chat_box_id+"_chat_section").length === 0){
                     usersConnected.append("<div class='user_element p_chat_popups' style='width:fit-content'>"+
                     "<div class='users_status' name='demo work'><span class='users_name'>"+element.replace("%40","@")+"</span><span class='users_online_status'>(online)</span></div>"+
                     "<div class='users_chat_box hide' style='margin-left:10px;'>"+
@@ -203,7 +203,7 @@
                                             "<!-- all the group messge from secket will be shown here -->"+
                                         "</div>"+
                                         "<div  class='participants_section hide' style='text-align:center;padding: 10px;height:60vh;overflow: scroll;width: 100%; '>"+
-                                            "<button name='add_member_to_"+element.replace(" ","_")+"' class='add_new_participant' class='' style='padding: 10px; text-transform: capitalize !important ;margin:10px !important'>add new participant<span class='	glyphicon glyphicon-plus' style='float: right;margin:0px 10px;'></span> </button>"+
+                                            "<button name='add_member_to_"+element.replace(" ","_")+"' class='add_new_participant hide' style='padding: 10px; text-transform: capitalize !important ;margin:10px !important'>add new participant<span class='glyphicon glyphicon-plus' style='float: right;margin:0px 10px;'></span> </button>"+
                                             "<p>List of participants</p><br/>"+
                                             "<div id='"+element.replace(" ","_")+"_participants_list'> nbnbflknbfl </div>"+
                                         "</div>"+
@@ -312,7 +312,7 @@
             e.preventDefault();
         });
 
-//========================= evet to handle when user logges out ====================
+//========================= event to handle when user logges out ====================
         $("#logout-button").click((e)=>{
             e.preventDefault();
             //clientSocket.emit("logout_user", servermsg.html());
@@ -338,13 +338,34 @@
         });       
         
 // ===================== event to handle if user list for a group is updated =====================
-    clientSocket.on("Group_participant_list_update" , (data)=>{
-        $("#"+data.grp_name.replace(" ","_")+"_participants_list").html("");
-        //alert(" : working" );
-        data.participants.forEach(element=>{
-            $("#"+data.grp_name.replace(" ","_")+"_participants_list").append("<div>"+ element.replace("%40","@") +"</div>")
+        clientSocket.on("Group_participant_list_update" , (data)=>{
+            $("#"+data.grp_name.replace(" ","_")+"_participants_list").html("");
+            //alert(" : working" );
+            //alert(data);
+            data.participants.forEach(element=>{
+                //alert(element.user_name);
+                if(element.type == "admin"){
+                    $("#"+data.grp_name.replace(" ","_")+"_participants_list").append("<div style='float:left'>"+ element.user_name.replace("%40","@") +" (admin)</div><br style='clear:right'/>")
+                    if( element.user_name.replace("%40","@") == servermsg.html().toString().replace("%40","@")){
+                        $("#"+data.grp_name.replace(" ","_")+"_participants_list").siblings(".add_new_participant").removeClass("hide");
+                    }
+                    
+                }
+                else{
+                    $("#"+data.grp_name.replace(" ","_")+"_participants_list").append("<div style='float:left'>"+ element.user_name.replace("%40","@") +"</div><br style='clear:right'/>");
+                    //$("#"+data.grp_name.replace(" ","_")+"_participants_list").siblings(".add_new_participant").addClass("hide");
+                }                
+            });
         });
-    });
+// ============================ event to handle when any user form socket is diconnected ================
+        clientSocket.on("delete_user_form_list" ,(data)=>{
+            var toadd = (data.user).substring(0, (data.user).indexOf("%40"));
+            if(toadd.indexOf(".")){
+                toadd = toadd.replace(".","_");
+            }         
+            $("#"+toadd+"_chat_section").parent(".users_chat_box").parent(".p_chat_popups").html("");
+
+        });
 
     });
 </script>
