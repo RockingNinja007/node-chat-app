@@ -5,7 +5,7 @@
     
     <div id="dashboardcontainer"  class="col-lg-6  col-md-6 col-sm-12 col-sx-12" style="float: left;padding-left:15vw">
         <% if(uname){%> 
-            <p><b>Hello  </b><span class=""><b><%= uname.substring(0,uname.indexOf("%40")) %></b> </span>  <span id="servermsg" class="servermsg" style="display:none;"><%= uname %></span> !!</p><br/>
+            <p><b>Hello </b><span style="font-weight: bolder"><%= uname.substring(0,uname.indexOf("%40")) %></span><span id="servermsg" class="servermsg" style="display:none;"><%= uname %></span> !!</p><br/>
         <%}%>            
         <input type="button" id="startCahtBtn" value="start chat" style="margin: 10vh;display: none;">
         <div id="usersConnected" style=" text-align: left ;color: #000;font-weight: bold">
@@ -186,7 +186,7 @@
             data.forEach(element => {
                 if($("#"+element.replace(" ","_")).length === 0){
                     //================= making link to naviage from group to group =============               
-                    $("#userGroups").append("<div class='chat_group_list_element' >"+ element.replace("_"," ") +"</div>");
+                    $("#userGroups").append("<div class='chat_group_list_element' >"+ element +"</div>");
                     
                     //============ containers for every group that is connected in the socket =============
                     $("#group_panel_container").append(
@@ -203,7 +203,7 @@
                                             "<!-- all the group messge from secket will be shown here -->"+
                                         "</div>"+
                                         "<div  class='participants_section hide' style='text-align:center;padding: 10px;height:60vh;overflow: scroll;width: 100%; '>"+
-                                            "<button name='add_member_to_"+element.replace(" ","_")+"' class='add_new_participant hide' style='padding: 10px; text-transform: capitalize !important ;margin:10px !important'>add new participant<span class='glyphicon glyphicon-plus' style='float: right;margin:0px 10px;'></span> </button>"+
+                                            "<button name='add_member_to_"+element.replace(" ","%20")+"' class='add_new_participant hide' style='padding: 10px; text-transform: capitalize !important ;margin:10px !important'>add new participant<span class='glyphicon glyphicon-plus' style='float: right;margin:0px 10px;'></span> </button>"+
                                             "<p>List of participants</p><br/>"+
                                             "<div id='"+element.replace(" ","_")+"_participants_list'> nbnbflknbfl </div>"+
                                         "</div>"+
@@ -227,7 +227,7 @@
                     alert("participant name cannot be empty");
                 }
                 else{
-                    var gorup_name = $(this).attr("name").substring(14).replace("_"," ");
+                    var gorup_name = $(this).attr("name").substring(14).replace("%20"," ");
                     clientSocket.emit("add_participant", {p_name:p_to_add.replace("@","%40"),grp_name:gorup_name}, (feedback)=>{
                         alert(feedback);
                     });
@@ -299,7 +299,7 @@
                 currentbox.append("<div style='border-radius: 10px 0px 10px 10px;background-color: green;padding: 5px;color: azure;width: fit-content;float:right'> <div class='chat_elements'>"+data.msg+"</div></div><br style='clear: right'/><br/>");    
             }
             else{
-                currentbox.append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.sender_name.replace("%40","@")+"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
+                currentbox.append("<div style='float:left;border-radius: 0px 10px 10px 10px;background-color: blue;padding: 5px;color: azure;width: fit-content;'>   <div style='font-size: .8em;font-style: italic'>"+data.sender_name.substring(0,data.sender_name.indexOf("%40")) +"</div><hr style='line-height: 0px;margin: 0px;border-top:1px solid #fff'><div class='chat_elements'>"+data.msg+"</div></div><br style='clear:left'/><br>");
             }
             //smooth scroling chatsection 
             currentbox.animate({scrollTop: currentbox[0].scrollHeight},200);

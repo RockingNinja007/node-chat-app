@@ -260,6 +260,7 @@ io.sockets.on('connection', (socket) =>{
                     users_init:[{user_name : socket.nickname,type : "admin"}] 
                 }; 
                 user_groups.push(group_object);// adding user created group in socket variable 
+                console.log(group_object.name + " added as group!!");
                 update_Group_List_At_USer_Side();// updatin group list at users end
 
                 io.sockets.emit("Group_participant_list_update",{grp_name : dat, participants : group_object.users_init});
@@ -270,6 +271,8 @@ io.sockets.on('connection', (socket) =>{
     // ==================== on adding a new user to the group ==================
     socket.on("add_participant",function(data, callback){
         //====== getting the index of the group =====
+
+        console.log("adding to "+ data.grp_name);
         var indexOfGroup = user_groups.findIndex(user_groups => user_groups.name === data.grp_name);
         var index_of_user = user_groups[indexOfGroup].users_init.indexOf(data.p_name);
         if(index_of_user != -1){
@@ -299,8 +302,9 @@ io.sockets.on('connection', (socket) =>{
         user_groups[indexOfGroup].users_init.forEach(element=>{
             //============== getting reference of all the members in the group ================
             var indexofuser = socketUsers.findIndex(socketUsers => socketUsers.name === element.user_name);
-            socketUsers[indexofuser].userSocket.emit("grp_message_delivery", data);
-                     
+            if(socketUsers[indexofuser]!=null){
+                socketUsers[indexofuser].userSocket.emit("grp_message_delivery", data);
+            }        
         });
     });
 
