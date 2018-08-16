@@ -32,11 +32,11 @@ var server_ip_address = process.env.OPENSHIFT_NODEJS_IP;
   //console.log( "Listening on " + server_ip_address + ", port " + server_port )
 }); */
 
-/* server.listen(server_port, server_ip_address, function () {
+ server.listen(server_port, server_ip_address, function () {
     //console.log( "Listening on " + server_ip_address + ", port " + server_port )
-}); */
+}); 
  
-server.listen(5000);
+//server.listen(5000);
 
 // setting up session middleware
 app.use(session({secret: 'secretdata'}));
